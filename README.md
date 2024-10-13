@@ -24,7 +24,7 @@ This project is a simple PHP-based web tool that lists extractable files (e.g., 
 Clone the repository from GitHub:
 
 ```bash
-git clone https://github.com/yourusername/extractable-files-web-tool.git
+git clone https://github.com/mashraf1997/Archieve-Extractor-On-Server
 ```
 
 ### Step 2: Move the Files to the Web Server Directory
