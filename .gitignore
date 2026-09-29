@@ -1,0 +1,4 @@
+# Extracted archive contents
+extracted/
+*.log
+.DS_Store
