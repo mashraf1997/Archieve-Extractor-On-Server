@@ -8,6 +8,7 @@ This project is a simple PHP-based web tool that lists extractable files (e.g., 
 - **Supported Formats**: The tool currently supports the extraction of `.zip`, `.tar`, `.tar.gz`, and `.gz` files.
 - **Simple UI**: Users can click a button next to each file to extract it directly in the web browser.
 - **PHP Extraction**: Uses built-in PHP libraries (`ZipArchive` and `PharData`) for extraction.
+- **Safe by design**: path-traversal, zip-slip and XSS protections (see [Security](#security)).
 
 ## Requirements
 
@@ -73,7 +74,7 @@ You should now see a list of all extractable files in the directory.
 ### 2. Extracting Files
 
 - Next to each listed file, you will see an **Extract** button. Click the button to extract the file directly within the web interface.
-- Files are extracted to the same directory where they are located.
+- Each archive is extracted into its own subfolder under `extracted/` (for example `extracted/backup.zip/`), so its contents never overwrite the working directory.
 
 ### 3. No Files Found
 
@@ -121,12 +122,17 @@ Simply add the desired file extension to this list.
 
 3. **Extraction Failures**: Check if the file is corrupted or if it uses a compression format that is not supported by the tool.
 
+## Security
+
+Extracting archives through a web interface is dangerous if done naively, so this tool applies several safeguards:
+
+- **No path traversal.** The archive to extract is chosen only from the files listed in the configured directory. The submitted name is reduced to its basename and confirmed to be a real file inside that directory, so it can't point elsewhere on disk.
+- **No zip slip.** Each archive is extracted into `extracted/<archive-name>/`, never over the working directory or web root. ZIP entries are checked for absolute or `..` paths and rejected, and TAR/GZIP extraction uses `PharData`'s traversal protection. This prevents an archive from planting an executable `.php` file into a web-served path.
+- **No XSS.** All filenames are HTML-escaped before display.
+- Errors are logged rather than printed, so server paths aren't leaked.
+
+> Keep the scan directory out of a public web path, and protect this script behind authentication. It is an administrative tool.
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
-
-### Key Points:
-
-- **Explanation**: This README provides a clear overview of the functionality, installation steps, usage instructions, and troubleshooting tips for the PHP-based file extraction tool.
-- **Customization**: I included a section on how to customize the directory where the tool scans for files, and how to add more file formats if needed.
